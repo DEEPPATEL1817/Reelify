@@ -1,13 +1,14 @@
-"use client" 
+// "use client" 
 
-import {
-    ImageKitAbortError,
-    ImageKitInvalidRequestError,
-    ImageKitServerError,
-    ImageKitUploadNetworkError,
-    upload,
-} from "@imagekit/next";
-import { useRef, useState } from "react";
+// import {
+//     ImageKitAbortError,
+//     ImageKitInvalidRequestError,
+//     ImageKitServerError,
+//     ImageKitUploadNetworkError,
+//     upload,
+// } from "@imagekit/next";
+// import { Loader2 } from "lucide-react";
+// import { useRef, useState } from "react";
 
 // UploadExample component demonstrates file uploading using ImageKit's Next.js SDK.
 // const FileUpload = () => {
@@ -131,89 +132,95 @@ import { useRef, useState } from "react";
 // another way to write imagekit code 
 
 
-interface fileUploadProps{
-    onSuccess: (res: any) => void
-    onProgress?: (progress: number) => void
-    fileType?: "image" | "video"
+"use client"; // This component must be a client component
+
+import {
+  ImageKitAbortError,
+  ImageKitInvalidRequestError,
+  ImageKitServerError,
+  ImageKitUploadNetworkError,
+  upload,
+} from "@imagekit/next";
+import { useRef, useState } from "react";
+
+interface FileUploadProps {
+  onSuccess: (res: any) => void;
+  onProgress?: (progress: number) => void;
+  fileType?: "image" | "video";
 }
 
-const fileUploadSecondMeth = ({onSuccess , onProgress , fileType} : fileUploadProps) => {
-    
-    const [uploading, setUploading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
-    
-    //optional validation
-    
-    const validateFile = (file: File) => {
-        if (fileType === "video") {
-            if (!file.type.startsWith("video/")) {
-                setError("Please upload a valid video file")
-            }
-        }
-        if(file.size > 100 * 1024 * 1024){
-            setError("File size should be under 100MB")
-        }
-        return true
+const FileUpload = ({ onSuccess, onProgress, fileType }: FileUploadProps) => {
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  //optional validation
+
+  const validateFile = (file: File) => {
+    if (fileType === "video") {
+      if (!file.type.startsWith("video/")) {
+        setError("Please upload a valid video file");
+      }
     }
+    if (file.size > 100 * 1024 * 1024) {
+      setError("File size must be less than 100 MB");
+    }
+    return true;
+  };
 
-const handleFileChange = async ( e: React.ChangeEvent<HTMLInputElement> ) => {
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
 
-    const file = e.target.files?.[0]
+    if (!file || !validateFile(file)) return;
 
-    if(!file || !validateFile(file)) return
-
-    setUploading(true)
-    setError(null)
+    setUploading(true);
+    setError(null);
 
     try {
-        const authResponse = await fetch("/api/auth/imagekit-auth")
+      console.log('public key in frontend ' , process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY)
+      const authRes = await fetch("/api/imagekit-auth");
 
-        const auth = await authResponse.json()
+      if (!authRes.ok) {
+  throw new Error("Failed to fetch auth parameters");
+}
+
+      const auth = await authRes.json();
+      console.log("Auth response from server:", auth)
+
+      const res = await upload({
+        file,
+        fileName: file.name,
+        publicKey: auth.publicKey,
+        signature: auth.signature,
+        expire: auth.expire,
+        token: auth.token,
+        onProgress: (event) => {
+          if(event.lengthComputable && onProgress){
+            const percent = (event.loaded / event.total) * 100;
+            onProgress(Math.round(percent))
+          }
+        },
         
-        const res = await upload({
-            file,
-            fileName: file.name,
-            publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
-            signature: auth.signature,
-            expire: auth.expire,
-            token: auth.token,
+      });
+      console.log("Upload response:", res);
 
-            onProgress: (event) => {
-                if (event.lengthComputable && onProgress) {
-                    const percent = (event.loaded / event.total) * 100;
-
-                    onProgress(Math.round(percent))
-                }
-            }
-        })
-
-        onSuccess(res)
-        
+      onSuccess(res)
     } catch (error) {
         console.error("Upload failed", error)
-    } finally{
+    } finally {
         setUploading(false)
     }
-}
+  };
 
-    return (
-        <>
-           
-            <input
-            type="file"
-            accept={fileType === "video" ? "video/*" : "image/*"}
-            onChange={handleFileChange}
-            />
-            {uploading && (
-                <span>Loading...</span>
-            )}
-         
-        </>
-    );
+  return (
+    <>
+      <input
+        type="file"
+        accept={fileType === "video" ? "video/*" : "image/*"}
+        onChange={handleFileChange}
+      />
+      {uploading && <span>Loading....</span>}
+    </>
+  );
+};
 
-}
-
-
-
-
-export default fileUploadSecondMeth
+export default FileUpload;

@@ -1,5 +1,6 @@
-
 import { getUploadAuthParams } from "@imagekit/next/server"
+import { NextResponse } from "next/server";
+
 
 export async function GET() {
     try {
@@ -10,12 +11,17 @@ export async function GET() {
         const authenticationParameters = getUploadAuthParams({
             privateKey: process.env.IMAGEKIT_PRIVATE_KEY as string, // Never expose this on client side
             publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY as string,
-            
+   
         })
     
-        return Response.json({ authenticationParameters, publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY });
+        console.log("PRIVATE_KEY:", process.env.IMAGEKIT_PRIVATE_KEY);
+        console.log("PUBLIC_KEY:", process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY);
+
+        return NextResponse.json({ ...authenticationParameters, publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY });
         
     } catch (error) {
-        return Response.json({ error: "Authentication Failed" } , {status: 500})
+        console.log("uploading vid may have issue",error);
+        console.error("Auth error:", error);
+        return NextResponse.json({ error: "Authentication Failed" } , {status: 500})
     }
 }

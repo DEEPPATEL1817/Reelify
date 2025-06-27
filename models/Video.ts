@@ -38,7 +38,8 @@ const videoSchema = new Schema<IVideo>(
         },
         thumbnailUrl: {
             type: String,
-            required: true,
+            required: false,
+            default: ""
         },
         controls: {
             type: Boolean,
