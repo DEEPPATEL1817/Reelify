@@ -35,7 +35,7 @@ export async function POST(request: NextRequest){
 
         const body: IVideo = await request.json()
 
-        if (!body.title || !body.description || !body.videoUrl || !body.thumbnailUrl) {
+        if (!body.title || !body.description || !body.videoUrl || !body.thumbnailUrl || !body.fileId) {
 
             return NextResponse.json({error: "Missing req. fields"} , {status: 401})
         }
@@ -58,28 +58,3 @@ export async function POST(request: NextRequest){
     }
 }
 
-export async function DELETE(request: NextRequest , { params }: { params: { id: string }}){
-    const session = await getServerSession(authOption)
-
-  try {
-      if (!session) {
-          return NextResponse.json({error:"You are Unauthorized to delete the post"} , {status: 401})
-      }
-
-      await connectToDataBase();
-
-      const fileDelete = await Video.findByIdAndDelete(params.id);
-
-      if (!fileDelete) {
-        return NextResponse.json({error: "File not found"}, {status: 401})
-      }
-       return NextResponse.json({error: "File Deleted Successfully"}, {status: 200})
-
-  } catch (error) {
-    console.error("Delete error:", error);
-    console.log("Delete error:", error);
-    return NextResponse.json({ error: "Failed to delete video" }, { status: 500 });
-  }
-
-    const video = 
-}

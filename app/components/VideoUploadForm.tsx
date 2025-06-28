@@ -14,6 +14,7 @@ interface VideoFormData {
   description: string;
   videoUrl: string;
   thumbnailUrl: string;
+  fileId: string;
 }
 
 export default function VideoUploadForm() {
@@ -39,6 +40,7 @@ export default function VideoUploadForm() {
     setValue("videoUrl", response.filePath);
     setValue("thumbnailUrl", response.thumbnailUrl || response.filePath);
     showNotification("Video uploaded successfully!", "success");
+    setValue("fileId", response.fileId)
   };
 
   const handleUploadProgress = (progress: number) => {
@@ -62,6 +64,10 @@ export default function VideoUploadForm() {
       setValue("videoUrl", "");
       setValue("thumbnailUrl", "");
       setUploadProgress(0);
+      setValue("fileId", "");
+
+      console.log("Submitting video data:", data);
+
     } catch (error) {
       showNotification(
         error instanceof Error ? error.message : "Failed to publish video",

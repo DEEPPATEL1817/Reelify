@@ -11,6 +11,7 @@ export interface IVideo {
     description: string;
     videoUrl: string;
     thumbnailUrl: string;
+    fileId: string;
     controls?: boolean;
     transformation?: {
         height: number,
@@ -41,6 +42,10 @@ const videoSchema = new Schema<IVideo>(
             required: false,
             default: ""
         },
+        fileId: {
+            type: String,
+            required: true,
+        },
         controls: {
             type: Boolean,
             required: true
@@ -51,9 +56,9 @@ const videoSchema = new Schema<IVideo>(
             quality: { type: Number, min: 1, max: 100 }
         }
 
-    },{timestamps: true}
+    }, { timestamps: true }
 )
 
-const Video = mongoose.models?.Video || mongoose.model<IVideo>("Video",videoSchema)
+const Video = mongoose.models?.Video || mongoose.model<IVideo>("Video", videoSchema)
 
 export default Video
