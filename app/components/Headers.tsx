@@ -21,7 +21,7 @@ export default function Header() {
   return (
     <div className="navbar bg-base-300 sticky top-0 z-40">
       <div className="container mx-auto">
-        <div className="flex-1 px-2 lg:flex-none">
+        <div className="flex-1 px-2 lg:flex-none ">
           <Link
             href="/"
             className="btn btn-ghost text-xl gap-2 normal-case font-bold"
@@ -30,8 +30,11 @@ export default function Header() {
               showNotification("Welcome to ImageKit ReelsPro", "info")
             }
           >
-            <Home className="w-5 h-5" />
+            <div className="flex gap-2 items-center top-10">
+
+            <Home className="w-5 h-5 "  />
             Video with AI
+            </div>
           </Link>
         </div>
         <div className="flex flex-1 justify-end px-2">
