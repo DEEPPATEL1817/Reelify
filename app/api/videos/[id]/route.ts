@@ -5,14 +5,20 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectToDataBase } from "@/lib/dbConnection";
 import Video from "@/models/Video";
 import ImageKit from "imagekit";
+import { get } from "http";
 
 const imagekit = new ImageKit({
-  publicKey: process.env.IMAGEKIT_PUBLIC_KEY!,
+  publicKey: process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY!,
   privateKey: process.env.IMAGEKIT_PRIVATE_KEY!,
   urlEndpoint: process.env.NEXT_PUBLIC_IMAGEKIT_URL_ENDPOINT!,
 });
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+console.log("ImageKit initialized with public key:", process.env.NEXT_PUBLIC_IMAGEKIT_PUBLIC_KEY);
+
+export async function DELETE(request: NextRequest, context: { params: { id: string } }) {
+
+    const {params} =  context
+
   try {
     const session = await getServerSession(authOption);
     if (!session) {

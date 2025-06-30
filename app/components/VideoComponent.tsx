@@ -14,7 +14,7 @@ export default function VideoComponent({ video }: { video: IVideo }) {
 const handleDelete = async () => {
   const confirmed = confirm("Are you sure you want to delete this video?");
   if (!confirmed) return;
-  
+
   try {
     const res = await fetch(`/api/videos/${video._id}`, {
       method: "DELETE",
@@ -68,7 +68,7 @@ const handleDelete = async () => {
 
         <p className="text-sm text-base-content/70 line-clamp-2 flex justify-between">
           {video.description}
-          <Trash2 className="text-red-400" onClick={handleDelete} />
+          <Trash2 className="text-red-400 cursor-pointer" onClick={handleDelete} />
         </p>
 
 
